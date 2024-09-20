@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  namespace: webapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: go-backend
+        image: go-backend:latest
+        imagePullPolicy: Never
+
+        ports:
+        - containerPort: 8000
+
+        volumeMounts:
+        - name: db-credentials
+          mountPath: /run/secrets/
+          readOnly: true
+
+      volumes:
+      - name: db-credentials
+        secret:
+          secretName: db-credentials        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: webapp
+spec:
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+  type: ClusterIP

@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: proxy-deployment
+  namespace: webapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: proxy
+  template:
+    metadata:
+      labels:
+        app: proxy
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 443
+        volumeMounts:
+        - name: ssl-cert
+          mountPath: /etc/nginx/ssl/
+        - name: nginx-conf
+          mountPath: /etc/nginx/conf.d/
+      volumes:
+      - name: ssl-cert
+        hostPath:
+          path: /home/Heggo/Desktop/ODC_DigitalHub/K8s/Project/ssl/
+      - name: nginx-conf
+        hostPath:
+          path: /home/Heggo/Desktop/ODC_DigitalHub/K8s/proxy_conf/
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: proxy-service
+  namespace: webapp
+spec:
+  selector:
+    app: proxy
+  ports:
+    - protocol: TCP
+      port: 443
+      targetPort: 443
+  type: LoadBalancer
