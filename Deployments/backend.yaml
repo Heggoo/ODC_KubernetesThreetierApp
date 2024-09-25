@@ -13,6 +13,7 @@ spec:
       labels:
         app: backend
     spec:
+      automountServiceAccountToken: false
       containers:
       - name: go-backend
         image: go-backend:latest
@@ -29,7 +30,7 @@ spec:
       volumes:
       - name: db-credentials
         secret:
-          secretName: db-credentials        
+          secretName: db-credentials
 ---
 apiVersion: v1
 kind: Service
